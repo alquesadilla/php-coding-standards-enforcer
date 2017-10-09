@@ -1,0 +1,23 @@
+{
+    "name": "alquesadilla/php-coding-standards-enforcer",
+    "description": "Enforce coding standards on your PHP & Javascript. Don't let your team mess up your code base.",
+    "keywords": ["laravel", "codesniffer", "phpcs", "git", "pre-commit", "hook", "eslint"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Scott Faisal",
+            "email": "scott@2levelsabove.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/console": "5.*",
+        "squizlabs/php_codesniffer": "^2.6",
+        "exussum12/coverage-checker": "0.7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Alquesadilla\\Enforcer\\": "src"
+        }
+    }
+}
