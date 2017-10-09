@@ -175,6 +175,7 @@ class EnforcerCheckCommand extends Command
         } else {
             if (!empty($phpcsOutput)) {
                 $this->warn($phpcsOutput);
+                $this->info("Please run 'php artisan enforcer:check' to interactively fix these files automatically");
                 $fixViolations = $this->confirm('Attempt to fix PHPCS violations automatically on a per file basis?');
                 if ($fixViolations){
                     $laundryBucket = [];
