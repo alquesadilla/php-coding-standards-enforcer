@@ -7,15 +7,9 @@ use Illuminate\Filesystem\Filesystem;
 
 class CopyGitHookCommand extends Command
 {
-
-
-    protected $name = 'enforcer:copy';
-
-
+    protected $signature = 'enforcer:copy';
     protected $description = 'Copy the git hooks scripts to hooks directory';
     protected $config;
-
-
     protected $files;
 
     public function __construct($config, Filesystem $files)
@@ -42,7 +36,7 @@ class CopyGitHookCommand extends Command
 
         $preCommitHook = $hooksDir . '/pre-commit';
         $preCommitContents = '#!/bin/bash'
-            . PHP_EOL . $this->config->get('enforcer.precommit_command', 'php artisan enforcer:check');
+            . PHP_EOL . $this->config->get('enforcer.precommit_command', 'php artisan enforcer:check --githook');
 
         $this->files->put($preCommitHook, $preCommitContents);
         $this->files->chmod($preCommitHook, 0755);

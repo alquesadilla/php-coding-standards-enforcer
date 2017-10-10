@@ -5,7 +5,7 @@ return array(
     'env' => 'local',
 
     // pre-commit command
-    'precommit_command' => 'php artisan enforcer:check',
+    'precommit_command' => 'php artisan enforcer:check --githook',
 
 
     'phpcs_bin' => './vendor/bin/phpcs',
