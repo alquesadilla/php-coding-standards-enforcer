@@ -174,9 +174,10 @@ class EnforcerCheckCommand extends Command
             exit(0);
         } else {
             if (!empty($phpcsOutput)) {
-                $this->warn($phpcsOutput);
+               // $this->warn($phpcsOutput);
+                $this->error("PHP Coding Style Violations Found!");
                 $this->info("Please run 'php artisan enforcer:check' to interactively fix these files automatically");
-                $fixViolations = $this->confirm('Attempt to fix PHPCS violations automatically on a per file basis?');
+                $fixViolations = $this->confirm('Attempt to fix PHP Coding Style violations automatically on a per file basis?');
                 if ($fixViolations){
                     $laundryBucket = [];
                     foreach ($phpStaged as $phpFile){
@@ -188,7 +189,7 @@ class EnforcerCheckCommand extends Command
                     if (count($laundryBucket) > 0){
                         foreach($laundryBucket as $dirtyFile){
 
-                            $fixThisFile = $this->confirm('Fix PHPCS violations automatically on: '.$dirtyFile.'?');
+                            $fixThisFile = $this->confirm('Fix PHP Coding Style violations automatically on: '.$dirtyFile.'?');
 
                             if ($fixThisFile){
                                 $phpcbfOutput = shell_exec("./vendor/bin/phpcbf -s --standard={$standard} --encoding={$encoding} -n $dirtyFile");
