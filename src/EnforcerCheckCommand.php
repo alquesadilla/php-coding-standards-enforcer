@@ -149,7 +149,7 @@ class EnforcerCheckCommand extends Command
             if (!empty($ignoreFiles)) {
                 $phpcsIgnore = ' --ignore=' . implode(',', $ignoreFiles);
             }
-            $phpcsOutput = shell_exec("\"{$phpcsBin}\" -s --standard={$standard} --encoding={$encoding} --extensions={$phpcsExtensions}{$phpcsIgnore} {$sniffFiles}");
+            $phpcsOutput = shell_exec("\"{$phpcsBin}\" -s --standard={$standard} --encoding={$encoding} --extensions={$phpcsExtensions}{$phpcsIgnore} {$sniffFiles} -n");
         }
 
         if (!empty($eslintBin) && !empty($eslintStaged)) {
