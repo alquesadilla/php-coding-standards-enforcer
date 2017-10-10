@@ -9,16 +9,10 @@ use Illuminate\Filesystem\Filesystem;
 class EnforcerCheckCommand extends Command
 {
 
-
-    protected $name = 'enforcer:check';
-
-
+    protected $signature = 'enforcer:check {--githook}';
     protected $description = 'Enforce coding standards on PHP & Javascript code using PHP_CodeSniffer and ESLint';
-
     protected $config;
-
     protected $files;
-
 
     public function __construct($config, Filesystem $files)
     {
@@ -32,6 +26,7 @@ class EnforcerCheckCommand extends Command
     {
         $environment = $this->config->get('app.env');
         $enforcerEnv = $this->config->get('enforcer.env');
+        $isGitHook = $this->option('githook');
 
         if ($environment !== $enforcerEnv) {
             return;
@@ -174,29 +169,33 @@ class EnforcerCheckCommand extends Command
             exit(0);
         } else {
             if (!empty($phpcsOutput)) {
-               // $this->warn($phpcsOutput);
+
+                if (!$isGitHook)
+                    $this->warn($phpcsOutput);
                 $this->error("PHP Coding Style Violations Found!");
-                $this->info("Please run 'php artisan enforcer:check' to interactively fix these files automatically");
-                $fixViolations = $this->confirm('Attempt to fix PHP Coding Style violations automatically on a per file basis?');
-                if ($fixViolations){
-                    $laundryBucket = [];
-                    foreach ($phpStaged as $phpFile){
-                        if (strpos($phpcsOutput, str_replace('"', '', $phpFile)) != false) {
-                            $phpFile = str_replace($tempStaging.'/', '', $phpFile);
-                            $laundryBucket[] = $phpFile;
-                        }
-                    }
-                    if (count($laundryBucket) > 0){
-                        foreach($laundryBucket as $dirtyFile){
+                $this->info("Please run 'php artisan enforcer:check' to view and interactively fix these violations automatically.");
 
-                            $fixThisFile = $this->confirm('Fix PHP Coding Style violations automatically on: '.$dirtyFile.'?');
-
-                            if ($fixThisFile){
-                                $phpcbfOutput = shell_exec("./vendor/bin/phpcbf -s --standard={$standard} --encoding={$encoding} -n $dirtyFile");
-                                $this->info($phpcbfOutput);
+                if (!$isGitHook) {
+                    $fixViolations = $this->confirm('Attempt to fix PHP Coding Style violations automatically on a per file basis?');
+                    if ($fixViolations) {
+                        $laundryBucket = [];
+                        foreach ($phpStaged as $phpFile) {
+                            if (strpos($phpcsOutput, str_replace('"', '', $phpFile)) != false) {
+                                $phpFile = str_replace($tempStaging . '/', '', $phpFile);
+                                $laundryBucket[] = $phpFile;
                             }
-                            else{
-                                $this->info("Skipped...");
+                        }
+                        if (count($laundryBucket) > 0) {
+                            foreach ($laundryBucket as $dirtyFile) {
+
+                                $fixThisFile = $this->confirm('Fix PHP Coding Style violations automatically on: ' . $dirtyFile . '?');
+
+                                if ($fixThisFile) {
+                                    $phpcbfOutput = shell_exec("./vendor/bin/phpcbf -s --standard={$standard} --encoding={$encoding} -n $dirtyFile");
+                                    $this->info($phpcbfOutput);
+                                } else {
+                                    $this->info("Skipped...");
+                                }
                             }
                         }
                     }
@@ -206,7 +205,6 @@ class EnforcerCheckCommand extends Command
             if (!empty($eslintOutput)) {
                 $this->error($eslintOutput);
             }
-
             exit(1);
         }
     }

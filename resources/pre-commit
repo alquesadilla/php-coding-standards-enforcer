@@ -1,2 +1,2 @@
 #!/bin/bash
-php artisan enforcer:check
+php artisan enforcer:check --githook
