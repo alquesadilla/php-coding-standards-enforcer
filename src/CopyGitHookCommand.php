@@ -29,7 +29,10 @@ class CopyGitHookCommand extends Command
             return;
         }
 
-        $hooksDir = base_path('.git/hooks');
+        //let's use GIT to get the GIT root path since not everyone places git in Laravel root.
+        $projectGitRoot = trim(shell_exec("git rev-parse --show-toplevel"));
+        $hooksDir = $projectGitRoot.'/.git/hooks';
+
         if (!$this->files->isDirectory($hooksDir)) {
             $this->files->makeDirectory($hooksDir, 0755);
         }

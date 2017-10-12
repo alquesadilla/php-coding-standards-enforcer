@@ -9,6 +9,7 @@ return array(
 
 
     'phpcs_bin' => './vendor/bin/phpcs',
+    'phpcbf_bin' => './vendor/bin/phpcbf',
 
     // code standard
     'standard' => 'PSR2',

@@ -33,6 +33,7 @@ class EnforcerCheckCommand extends Command
         }
 
         $phpcsBin = $this->config->get('enforcer.phpcs_bin');
+        $phpcbfBin = $this->config->get('enforcer.phpcbf_bin');
         $eslintBin = $this->config->get('enforcer.eslint_bin');
         $eslintConfig = $this->config->get('enforcer.eslint_config');
         $eslintIgnorePath = $this->config->get('enforcer.eslint_ignore_path');
@@ -191,7 +192,7 @@ class EnforcerCheckCommand extends Command
                                 $fixThisFile = $this->confirm('Fix PHP Coding Style violations automatically on: ' . $dirtyFile . '?');
 
                                 if ($fixThisFile) {
-                                    $phpcbfOutput = shell_exec("./vendor/bin/phpcbf -s --standard={$standard} --encoding={$encoding} -n $dirtyFile");
+                                    $phpcbfOutput = shell_exec("\"{$phpcbfBin}\" -s --standard={$standard} --encoding={$encoding} -n $dirtyFile");
                                     $this->info($phpcbfOutput);
                                 } else {
                                     $this->info("Skipped...");
