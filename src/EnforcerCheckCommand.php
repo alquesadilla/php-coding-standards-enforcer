@@ -27,6 +27,7 @@ class EnforcerCheckCommand extends Command
         $environment = $this->config->get('app.env');
         $enforcerEnv = $this->config->get('enforcer.env');
         $isGitHook = $this->option('githook');
+        $projectGitRoot = trim(shell_exec("git rev-parse --show-toplevel"));
 
         if ($environment !== $enforcerEnv) {
             return;
@@ -115,23 +116,42 @@ class EnforcerCheckCommand extends Command
         $this->files->makeDirectory($tempStaging);
         $phpStaged = [];
         $eslintStaged = [];
+
+
+        //to address the Git root folder not being the same as laravel root
+        $pathDiff = null;
+        if ($projectGitRoot !== base_path()){
+            $pathDiff = str_replace($projectGitRoot, '', base_path());
+            $pathDiff = substr($pathDiff, 1)."/";
+        }
+
+
+
         foreach ($validFiles as $f) {
-            $id = shell_exec("git diff-index --cached {$against} \"{$f}\" | cut -d \" \" -f4");
-            if (!$this->files->exists($tempStaging . '/' . $this->files->dirname($f))) {
-                $this->files->makeDirectory($tempStaging . '/' . $this->files->dirname($f), 0755, true);
+            if ($pathDiff !== null) {
+                if (substr($f, 0, strlen($pathDiff)) === $pathDiff) {
+                    $validFile = substr($f, strlen($pathDiff));
+                } else {
+                    $validFile = $f;
+                }
+            }
+
+            $id = shell_exec("git diff-index --cached {$against} \"{$validFile}\" | cut -d \" \" -f4");
+            if (!$this->files->exists($tempStaging . '/' . $this->files->dirname($validFile))) {
+                $this->files->makeDirectory($tempStaging . '/' . $this->files->dirname($validFile), 0755, true);
             }
             $output = shell_exec("git cat-file blob {$id}");
-            $this->files->put($tempStaging . '/' . $f, $output);
+            $this->files->put($tempStaging . '/' . $validFile, $output);
 
             if (!empty($phpcsBin)) {
-                if (in_array($this->files->extension($f), $validPhpExtensions)) {
-                    $phpStaged[] = '"' . $tempStaging . '/' . $f . '"';
+                if (in_array($this->files->extension($validFile), $validPhpExtensions)) {
+                    $phpStaged[] = '"' . $tempStaging . '/' . $validFile . '"';
                 }
             }
 
             if (!empty($eslintBin)) {
-                if (in_array($this->files->extension($f), $validEslintExtensions)) {
-                    $eslintStaged[] = '"' . $tempStaging . '/' . $f . '"';
+                if (in_array($this->files->extension($validFile), $validEslintExtensions)) {
+                    $eslintStaged[] = '"' . $tempStaging . '/' . $validFile . '"';
                 }
             }
         }
