@@ -128,11 +128,10 @@ class EnforcerCheckCommand extends Command
 
 
         foreach ($validFiles as $f) {
+            $validFile = $f;
             if ($pathDiff !== null) {
                 if (substr($f, 0, strlen($pathDiff)) === $pathDiff) {
                     $validFile = substr($f, strlen($pathDiff));
-                } else {
-                    $validFile = $f;
                 }
             }
 
