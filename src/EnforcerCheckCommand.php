@@ -197,12 +197,13 @@ class EnforcerCheckCommand extends Command
             $eslintOutput = shell_exec("\"{$eslintBin}\" -c \"{$eslintConfig}\"{$eslintIgnore} --quiet  {$eslintFiles}");
         }
 
+        //only if a php file is modified, will the documentation be generated
         if (!empty($swaggerBin) && !empty($phpStaged)) {
 
             if (!$this->files->exists($this->files->dirname($swaggerOutputPath))) {
                 $this->files->makeDirectory($this->files->dirname($swaggerOutputPath), 0755, true);
             }
-            $swaggerOutput = shell_exec("\"{$swaggerBin}\" -o {$swaggerOutputPath} > /dev/null 2>&1");
+            $swaggerOutput = shell_exec("\"{$swaggerBin}\" app/ -o {$swaggerOutputPath} > /dev/null 2>&1");
         }
         $this->files->deleteDirectory($tempStaging);
 
