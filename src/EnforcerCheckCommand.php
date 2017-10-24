@@ -10,7 +10,7 @@ class EnforcerCheckCommand extends Command
 {
 
     protected $signature = 'enforcer:check {--githook}';
-    protected $description = 'Enforce coding standards on PHP & Javascript code using PHP_CodeSniffer and ESLint';
+    protected $description = 'Enforce coding standards on PHP & Javascript code using PHP_CodeSniffer and ESLint. Now with Swagger support.';
     protected $config;
     protected $files;
 
@@ -21,13 +21,17 @@ class EnforcerCheckCommand extends Command
         $this->files = $files;
     }
 
-
     public function handle()
     {
         $environment = $this->config->get('app.env');
         $enforcerEnv = $this->config->get('enforcer.env');
         $isGitHook = $this->option('githook');
         $projectGitRoot = trim(shell_exec("git rev-parse --show-toplevel"));
+
+        if (!$projectGitRoot) {
+            $this->error('Not detecting GIT.');
+            exit(1);
+        }
 
         if ($environment !== $enforcerEnv) {
             return;
@@ -38,6 +42,8 @@ class EnforcerCheckCommand extends Command
         $eslintBin = $this->config->get('enforcer.eslint_bin');
         $eslintConfig = $this->config->get('enforcer.eslint_config');
         $eslintIgnorePath = $this->config->get('enforcer.eslint_ignore_path');
+        $swaggerBin = $this->config->get('enforcer.swagger_bin');
+        $swaggerOutputPath = $this->config->get('enforcer.swagger_output_path');
 
         if (!empty($phpcsBin)) {
             if (!$this->files->exists($phpcsBin)) {
@@ -64,9 +70,17 @@ class EnforcerCheckCommand extends Command
             }
         }
 
+        //Swagger
+        if (!empty($swaggerBin)) {
+            if (!$this->files->exists($swaggerBin)) {
+                $this->error('Swagger not found');
+                exit(1);
+            }
+        }
+
         //one of them needs to be active
-        if (empty($phpcsBin) && empty($eslintBin)) {
-            $this->error('Eslint bin and Phpcs bin are not configured');
+        if (empty($phpcsBin) && empty($eslintBin) && empty($swaggerBin)) {
+            $this->error('Phpcs/ESlint/Swagger bins are not configured');
             exit(1);
         }
 
@@ -183,6 +197,13 @@ class EnforcerCheckCommand extends Command
             $eslintOutput = shell_exec("\"{$eslintBin}\" -c \"{$eslintConfig}\"{$eslintIgnore} --quiet  {$eslintFiles}");
         }
 
+        if (!empty($swaggerBin) && !empty($phpStaged)) {
+
+            if (!$this->files->exists($this->files->dirname($swaggerOutputPath))) {
+                $this->files->makeDirectory($this->files->dirname($swaggerOutputPath), 0755, true);
+            }
+            $swaggerOutput = shell_exec("\"{$swaggerBin}\" -o {$swaggerOutputPath} > /dev/null 2>&1");
+        }
         $this->files->deleteDirectory($tempStaging);
 
         if (empty($phpcsOutput) && empty($eslintOutput)) {

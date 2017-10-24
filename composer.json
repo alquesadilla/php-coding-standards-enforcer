@@ -1,7 +1,7 @@
 {
     "name": "alquesadilla/php-coding-standards-enforcer",
-    "description": "Enforce coding standards on your PHP & Javascript. Don't let your team mess up your code base.",
-    "keywords": ["laravel", "codesniffer", "phpcs", "git", "pre-commit", "hook", "eslint"],
+    "description": "Enforce coding standards on your PHP & Javascript. Now with SWagger Support.  Don't let your team mess up your code base.",
+    "keywords": ["laravel", "codesniffer", "phpcs", "git", "pre-commit", "hook", "eslint", "swagger"],
     "license": "MIT",
     "authors": [
         {
@@ -13,7 +13,8 @@
         "php": ">=5.5.9",
         "illuminate/console": "5.*",
         "squizlabs/php_codesniffer": "^2.6",
-        "exussum12/coverage-checker": "0.7.*"
+        "exussum12/coverage-checker": "^0.7.2",
+        "zircote/swagger-php": "^2.0"
     },
     "autoload": {
         "psr-4": {
