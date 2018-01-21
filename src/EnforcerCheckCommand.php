@@ -9,7 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 class EnforcerCheckCommand extends Command
 {
 
-    protected $signature = 'enforcer:check {branch? : The branch to compare against} {--githook}';
+    protected $signature = 'enforcer:check {branch? : The branch to compare against} {--githook} {--outputOnly}';
     protected $description = 'Enforce coding standards on PHP & Javascript code using PHP_CodeSniffer and ESLint. Now with Swagger support.';
     protected $config;
     protected $files;
@@ -92,11 +92,12 @@ class EnforcerCheckCommand extends Command
             $against = 'HEAD';
         }
 
+        $files = trim(shell_exec("git diff-index --name-only --cached --diff-filter=ACMR {$against} --"));
+
         if ($branch = $this->argument('branch')) {
             $against = $branch;
+            $files = trim(shell_exec("git diff-index --name-only --diff-filter=ACMR {$against} --"));
         }
-
-        $files = trim(shell_exec("git diff-index --name-only --cached --diff-filter=ACMR {$against} --"));
 
         if (empty($files)) {
             $this->info("No files.");
@@ -154,6 +155,7 @@ class EnforcerCheckCommand extends Command
             }
 
             $id = shell_exec("git diff-index --cached {$against} \"{$validFile}\" | cut -d \" \" -f4");
+            
             if (!$this->files->exists($tempStaging . '/' . $this->files->dirname($validFile))) {
                 $this->files->makeDirectory($tempStaging . '/' . $this->files->dirname($validFile), 0755, true);
             }
@@ -164,6 +166,8 @@ class EnforcerCheckCommand extends Command
                 if (in_array($this->files->extension($validFile), $validPhpExtensions)) {
                     $phpStaged[] = '"' . $tempStaging . '/' . $validFile . '"';
                 }
+            } else {
+                echo 'sadfasd';
             }
 
             if (!empty($eslintBin)) {
@@ -219,13 +223,13 @@ class EnforcerCheckCommand extends Command
             exit(0);
         } else {
             if (!empty($phpcsOutput)) {
-                if (!$isGitHook) {
+                if (!$isGitHook || $this->option('outputOnly')) {
                     $this->warn($phpcsOutput);
                 }
                 $this->error("PHP Coding Style Violations Found!");
                 $this->info("Please run 'php artisan enforcer:check' to view and interactively fix these violations automatically.");
 
-                if (!$isGitHook) {
+                if (!$isGitHook && !$this->option('outputOnly')) {
                     $fixViolations = $this->confirm('Attempt to fix PHP Coding Style violations automatically on a per file basis?');
                     if ($fixViolations) {
                         $laundryBucket = [];

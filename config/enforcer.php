@@ -13,7 +13,7 @@ return array(
     'phpcbf_bin' => __DIR__ . '/../vendor/bin/phpcbf',
 
     // code standard
-    'standard' => 'PSR2',
+    'standard' => '$(pwd)/vendor/chadicus/coding-standard/Chadicus',
 
     // file encoding
     'encoding' => 'utf-8',

@@ -22,7 +22,8 @@ $enforcer->setLaravel(new Container());
 $params = [];
 
 if (isset($argv[1])) {
-    $parmas['branch'] = $argv[1];
+    $params['branch'] = $argv[1];
+    $params['--outputOnly'] = true;
 }
 
 $enforcer->run(
@@ -31,6 +32,7 @@ $enforcer->run(
         new InputDefinition([
             new InputArgument('enforcer', InputArgument::OPTIONAL, null, 'check'),
             new InputOption('githook'),
+            new InputOption('outputOnly'),
             new InputArgument('branch', InputArgument::OPTIONAL)
         ])
     ),
