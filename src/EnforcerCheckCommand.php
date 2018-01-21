@@ -9,7 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 class EnforcerCheckCommand extends Command
 {
 
-    protected $signature = 'enforcer:check {--githook}';
+    protected $signature = 'enforcer:check {branch? : The branch to compare against} {--githook}';
     protected $description = 'Enforce coding standards on PHP & Javascript code using PHP_CodeSniffer and ESLint. Now with Swagger support.';
     protected $config;
     protected $files;
@@ -92,8 +92,12 @@ class EnforcerCheckCommand extends Command
             $against = 'HEAD';
         }
 
+        if ($branch = $this->argument('branch')) {
+            $against = $branch;
+        }
 
         $files = trim(shell_exec("git diff-index --name-only --cached --diff-filter=ACMR {$against} --"));
+
         if (empty($files)) {
             $this->info("No files.");
             exit(0);
@@ -172,7 +176,7 @@ class EnforcerCheckCommand extends Command
         $eslintOutput = null;
         $phpcsOutput = null;
 
-        if (!     empty($phpcsBin) && !empty($phpStaged)
+        if (!    empty($phpcsBin) && !empty($phpStaged)
 
 
         ) {

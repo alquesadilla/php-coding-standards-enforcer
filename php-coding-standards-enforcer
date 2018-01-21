@@ -19,12 +19,19 @@ $config = new Illuminate\Config\Repository($enforcerConfigs);
 $enforcer = new EnforcerCheckCommand($config, new Filesystem());
 $enforcer->setLaravel(new Container());
 
+$params = [];
+
+if (isset($argv[1])) {
+    $parmas['branch'] = $argv[1];
+}
+
 $enforcer->run(
     new ArrayInput(
-        [],
+        $params,
         new InputDefinition([
             new InputArgument('enforcer', InputArgument::OPTIONAL, null, 'check'),
-            new InputOption('githook')
+            new InputOption('githook'),
+            new InputArgument('branch', InputArgument::OPTIONAL)
         ])
     ),
     new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)
