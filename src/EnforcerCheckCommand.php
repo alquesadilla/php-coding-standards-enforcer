@@ -6,15 +6,48 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Filesystem\Filesystem;
 
+/**
+ * Class EnforcerCheckCommand
+ * @package Alquesadilla\Enforcer
+ */
 class EnforcerCheckCommand extends Command
 {
-
+    /**
+     * Signature of the artisan command.
+     * @var string
+     */
     protected $signature = 'enforcer:check {branch? : The branch to compare against} {--githook} {--outputOnly}';
-    protected $description = 'Enforce coding standards on PHP & Javascript code using PHP_CodeSniffer and ESLint. Now with Swagger support.';
+
+    /**
+     * Description.
+     * @var string
+     */
+    protected $description = 'Enforce coding standards on PHP & Javascript code using PHP_CodeSniffer and ESLint. "
+        . "Now with Swagger support.';
+
+    /**
+     * Interface for config.
+     * @var Repository
+     */
     protected $config;
+
+    /**
+     * Files of the filesystem.
+     * @var Filesystem
+     */
     protected $files;
+
+    /**
+     * Directory for violation fixes to be written to.
+     * @var string
+     */
     protected $tempStaging;
 
+    /**
+     * EnforcerCheckCommand constructor.
+     * @param Repository $config The configurations.
+     * @param Filesystem $files  The files.
+     */
     public function __construct(Repository $config, Filesystem $files)
     {
         parent::__construct();
@@ -22,6 +55,10 @@ class EnforcerCheckCommand extends Command
         $this->files = $files;
     }
 
+    /**
+     * Handles the main console command.
+     * @return integer
+     */
     public function handle()
     {
         $phpcsBin = $this->config->get('enforcer.phpcs_bin');
@@ -33,7 +70,8 @@ class EnforcerCheckCommand extends Command
 
         $this->verifyDependencies();
 
-        //https://stackoverflow.com/questions/9765453/is-gits-semi-secret-empty-tree-object-reliable-and-why-is-there-not-a-symbolic
+        // https://stackoverflow.com/questions/9765453/
+        // is-gits-semi-secret-empty-tree-object-reliable-and-why-is-there-not-a-symbolic
         $revision = trim(shell_exec('git rev-parse --verify HEAD'));
         $against = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
         if (!empty($revision)) {
