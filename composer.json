@@ -26,5 +26,8 @@
     },
     "bin": [
         "php-coding-standards-enforcer"
-    ]
+    ],
+    "require-dev": {
+        "chadicus/coding-standard": "^1.3"
+    }
 }
