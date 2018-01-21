@@ -9,8 +9,8 @@ return array(
 
 
     //############## PHPCS & PHPCBF
-    'phpcs_bin' => './vendor/bin/phpcs',
-    'phpcbf_bin' => './vendor/bin/phpcbf',
+    'phpcs_bin' => __DIR__ . '/../vendor/bin/phpcs',
+    'phpcbf_bin' => __DIR__ . '/../vendor/bin/phpcbf',
 
     // code standard
     'standard' => 'PSR2',
@@ -53,6 +53,6 @@ return array(
 
     //################# Swagger
 
-    'swagger_bin' => './vendor/bin/swagger',
+    'swagger_bin' => __DIR__ . '/../vendor/bin/swagger',
     'swagger_output_path' => 'storage/docs/api-docs.json',
 );
