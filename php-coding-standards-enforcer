@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+// application.php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Alquesadilla\Enforcer\EnforcerCheckCommand;
+use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Container\Container;
+
+$enforcerConfigs = ['enforcer' => require_once(__DIR__ . '/config/enforcer.php'), 'app' => ['env' => 'local']];
+$config = new Illuminate\Config\Repository($enforcerConfigs);
+
+$enforcer = new EnforcerCheckCommand($config, new Filesystem());
+$enforcer->setLaravel(new Container());
+
+$enforcer->run(
+    new ArrayInput(
+        [],
+        new InputDefinition([
+            new InputArgument('enforcer', InputArgument::OPTIONAL, null, 'check'),
+            new InputOption('githook')
+        ])
+    ),
+    new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)
+);
