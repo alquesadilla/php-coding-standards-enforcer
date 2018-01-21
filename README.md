@@ -6,18 +6,19 @@ Enforce coding standards on your PHP & JS code base
 ```sh
 composer require alquesadilla/php-coding-standards-enforcer --dev
 ```
+### Laravel Usage
 
-#### Add the provider to app config
+##### Add the provider to app config
 ```sh
 Alquesadilla\Enforcer\EnforcerServiceProvider::class
 ```
 
-#### Use artisan to publish the config
+##### Use artisan to publish the config
 ```sh
 php artisan vendor:publish --provider="Alquesadilla\Enforcer\EnforcerServiceProvider" --tag=config
 ```
 
-#### Run artisan command to copy the pre-commit hook
+##### Run artisan command to copy the pre-commit hook
 ```sh
 php artisan enforcer:copy
 ```
@@ -29,4 +30,16 @@ If you are working with other developers and you prefer each time that someone m
     "...laravel commands..."
     "php artisan enforcer:copy"
 ],
+```
+
+### Standalone Usage
+
+To run against your staged code
+```sh
+./php-coding-standards-enforcer
+```
+
+To run against a branch if you are submitting a pull request
+```sh
+./php-coding-standards-enforcer {$branch}
 ```
