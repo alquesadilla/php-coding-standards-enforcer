@@ -7,7 +7,6 @@ return array(
     // pre-commit command
     'precommit_command' => 'php artisan enforcer:check --githook',
 
-
     //############## PHPCS & PHPCBF
     'phpcs_bin' => __DIR__ . '/../vendor/bin/phpcs',
     'phpcbf_bin' => __DIR__ . '/../vendor/bin/phpcbf',
@@ -32,8 +31,6 @@ return array(
     // temp dir to staged files
     'temp' => '.tmp_staging',
 
-
-
     //############### Eslint
 
     'eslint_bin' => '',
@@ -49,7 +46,6 @@ return array(
     // add the value of your temp folder to properly ignore files
     // ex: !.tmp_staging (on the first line of you ignore file)
     'eslint_ignore_path' => '',
-
 
     //################# Swagger
 

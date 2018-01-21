@@ -154,20 +154,25 @@ class EnforcerCheckCommand extends Command
                 }
             }
 
-            $id = shell_exec("git diff-index --cached {$against} \"{$validFile}\" | cut -d \" \" -f4");
-            
+            $output = '';
+
+            // When a branch is passed, we work off the working tree (not cached)
+            if ($this->argument('branch')) {
+                $output = shell_exec("cat {$validFile}");
+            } else {
+                $id = shell_exec("git diff-index --cached {$against} \"{$validFile}\" | cut -d \" \" -f4");
+                $output = shell_exec("git cat-file blob {$id}");
+            }
+
             if (!$this->files->exists($tempStaging . '/' . $this->files->dirname($validFile))) {
                 $this->files->makeDirectory($tempStaging . '/' . $this->files->dirname($validFile), 0755, true);
             }
-            $output = shell_exec("git cat-file blob {$id}");
             $this->files->put($tempStaging . '/' . $validFile, $output);
 
             if (!empty($phpcsBin)) {
                 if (in_array($this->files->extension($validFile), $validPhpExtensions)) {
                     $phpStaged[] = '"' . $tempStaging . '/' . $validFile . '"';
                 }
-            } else {
-                echo 'sadfasd';
             }
 
             if (!empty($eslintBin)) {
