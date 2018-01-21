@@ -14,11 +14,20 @@
         "illuminate/console": "5.*",
         "squizlabs/php_codesniffer": "^2.6",
         "exussum12/coverage-checker": "^0.7.2",
-        "zircote/swagger-php": "^2.0"
+        "zircote/swagger-php": "^2.0",
+        "illuminate/config": "^5.5",
+        "illuminate/filesystem": "^5.5",
+        "illuminate/container": "^5.5"
     },
     "autoload": {
         "psr-4": {
             "Alquesadilla\\Enforcer\\": "src"
         }
+    },
+    "bin": [
+        "php-coding-standards-enforcer"
+    ],
+    "require-dev": {
+        "chadicus/coding-standard": "^1.3"
     }
 }

@@ -7,13 +7,12 @@ return array(
     // pre-commit command
     'precommit_command' => 'php artisan enforcer:check --githook',
 
-
     //############## PHPCS & PHPCBF
-    'phpcs_bin' => './vendor/bin/phpcs',
-    'phpcbf_bin' => './vendor/bin/phpcbf',
+    'phpcs_bin' => __DIR__ . '/../vendor/bin/phpcs',
+    'phpcbf_bin' => __DIR__ . '/../vendor/bin/phpcbf',
 
     // code standard
-    'standard' => 'PSR2',
+    'standard' => '$(pwd)/vendor/chadicus/coding-standard/Chadicus',
 
     // file encoding
     'encoding' => 'utf-8',
@@ -32,8 +31,6 @@ return array(
     // temp dir to staged files
     'temp' => '.tmp_staging',
 
-
-
     //############### Eslint
 
     'eslint_bin' => '',
@@ -50,9 +47,8 @@ return array(
     // ex: !.tmp_staging (on the first line of you ignore file)
     'eslint_ignore_path' => '',
 
-
     //################# Swagger
 
-    'swagger_bin' => './vendor/bin/swagger',
+    'swagger_bin' => __DIR__ . '/../vendor/bin/swagger',
     'swagger_output_path' => 'storage/docs/api-docs.json',
 );
