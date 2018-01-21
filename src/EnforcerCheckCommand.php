@@ -3,8 +3,8 @@
 namespace Alquesadilla\Enforcer;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Filesystem\Filesystem;
-
 
 class EnforcerCheckCommand extends Command
 {
@@ -14,7 +14,7 @@ class EnforcerCheckCommand extends Command
     protected $config;
     protected $files;
 
-    public function __construct($config, Filesystem $files)
+    public function __construct(Repository $config, Filesystem $files)
     {
         parent::__construct();
         $this->config = $config;
@@ -34,6 +34,7 @@ class EnforcerCheckCommand extends Command
         }
 
         if ($environment !== $enforcerEnv) {
+            $this->error("`$environment` is not the enforcer's environment `$enforcerEnv`");
             return;
         }
 
@@ -94,6 +95,7 @@ class EnforcerCheckCommand extends Command
 
         $files = trim(shell_exec("git diff-index --name-only --cached --diff-filter=ACMR {$against} --"));
         if (empty($files)) {
+            $this->info("No files.");
             exit(0);
         }
 
@@ -107,7 +109,7 @@ class EnforcerCheckCommand extends Command
         //based on config values
         $validPhpExtensions = $this->config->get('enforcer.phpcs_extensions');
         $validEslintExtensions = $this->config->get('enforcer.eslint_extensions');
-        $validFiles = [];
+        $validFiles =  [];
 
         foreach ($fileList as $l) {
             if (!empty($phpcsBin)) {
@@ -131,14 +133,12 @@ class EnforcerCheckCommand extends Command
         $phpStaged = [];
         $eslintStaged = [];
 
-
         //to address the Git root folder not being the same as laravel root
         $pathDiff = null;
-        if ($projectGitRoot !== base_path()){
-            $pathDiff = str_replace($projectGitRoot, '', base_path());
-            $pathDiff = substr($pathDiff, 1)."/";
-        }
-
+//        if ($projectGitRoot !== base_path()){
+//            $pathDiff = str_replace($projectGitRoot, '', base_path());
+//            $pathDiff = substr($pathDiff, 1)."/";
+//        }
 
 
         foreach ($validFiles as $f) {
@@ -172,7 +172,10 @@ class EnforcerCheckCommand extends Command
         $eslintOutput = null;
         $phpcsOutput = null;
 
-        if (!empty($phpcsBin) && !empty($phpStaged)) {
+        if (!     empty($phpcsBin) && !empty($phpStaged)
+
+
+        ) {
             $standard = $this->config->get('enforcer.standard');
             $encoding = $this->config->get('enforcer.encoding');
             $ignoreFiles = $this->config->get('enforcer.phpcs_ignore');
@@ -183,7 +186,8 @@ class EnforcerCheckCommand extends Command
             if (!empty($ignoreFiles)) {
                 $phpcsIgnore = ' --ignore=' . implode(',', $ignoreFiles);
             }
-            $phpcsOutput = shell_exec("\"{$phpcsBin}\" -s --standard={$standard} --encoding={$encoding} --extensions={$phpcsExtensions}{$phpcsIgnore} {$sniffFiles} -n");
+
+            $phpcsOutput = shell_exec("\"{$phpcsBin}\" -s --standard={$standard} --encoding={$encoding} --extensions={$phpcsExtensions}{$phpcsIgnore} {$sniffFiles}");
         }
 
         if (!empty($eslintBin) && !empty($eslintStaged)) {
@@ -199,7 +203,6 @@ class EnforcerCheckCommand extends Command
 
         //only if a php file is modified, will the documentation be generated
         if (!empty($swaggerBin) && !empty($phpStaged)) {
-
             if (!$this->files->exists($this->files->dirname($swaggerOutputPath))) {
                 $this->files->makeDirectory($this->files->dirname($swaggerOutputPath), 0755, true);
             }
@@ -208,12 +211,13 @@ class EnforcerCheckCommand extends Command
         $this->files->deleteDirectory($tempStaging);
 
         if (empty($phpcsOutput) && empty($eslintOutput)) {
+            $this->info('All files abide.');
             exit(0);
         } else {
             if (!empty($phpcsOutput)) {
-
-                if (!$isGitHook)
+                if (!$isGitHook) {
                     $this->warn($phpcsOutput);
+                }
                 $this->error("PHP Coding Style Violations Found!");
                 $this->info("Please run 'php artisan enforcer:check' to view and interactively fix these violations automatically.");
 
@@ -229,7 +233,6 @@ class EnforcerCheckCommand extends Command
                         }
                         if (count($laundryBucket) > 0) {
                             foreach ($laundryBucket as $dirtyFile) {
-
                                 $fixThisFile = $this->confirm('Fix PHP Coding Style violations automatically on: ' . $dirtyFile . '?');
 
                                 if ($fixThisFile) {
@@ -242,7 +245,6 @@ class EnforcerCheckCommand extends Command
                         }
                     }
                 }
-
             }
             if (!empty($eslintOutput)) {
                 $this->error($eslintOutput);
